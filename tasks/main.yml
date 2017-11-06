@@ -1,0 +1,75 @@
+---
+- name: include variable overrides
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+        - "vars/{{ ansible_distribution }}.yml"
+        - "vars/{{ ansible_os_family }}.yml"
+      skip: true
+
+- name: check existing configuration
+  stat: path=/etc/gitlab/gitlab.rb
+  register: gitlab_config_file
+
+- name: check existing installation
+  stat: path=/usr/bin/gitlab-ctl
+  register: gitlab_file
+
+- name: install gitlab dependencies
+  package:
+    name: "{{ item }}"
+    state: installed
+  become: yes
+  with_items: "{{ gitlab_package_dependency | default(gitlab_package_dependency_default) }}"
+
+- name: download gitlab repository installation script
+  get_url:
+    url: "{{ gitlab_repository_installation_script_url }}"
+    dest: /tmp/gitlab_install_repository.sh
+    validate_certs: "{{ gitlab_download_validate_certs }}"
+    mode: 755
+  when: not gitlab_file.stat.exists
+
+- name: install gitlab repository
+  command: /tmp/gitlab_install_repository.sh
+  when: not gitlab_file.stat.exists
+  become: yes
+
+- name: install gitlab
+  package:
+    name: "{{ gitlab_package | default(gitlab_package_default) }}"
+    state: installed
+  when: not gitlab_file.stat.exists
+
+# Start and configure GitLab. Sometimes the first run fails, but after that,
+# restarts fix problems, so ignore failures on this run.
+- name: reconfigure gitlab (first run)
+  command: gitlab-ctl reconfigure
+  args:
+    creates: /var/opt/gitlab/bootstrapped
+  failed_when: false
+
+- name: create gitlab ssl configuration folder
+  file:
+    path: /etc/gitlab/ssl
+    state: directory
+    owner: "{{ gitlab_user }}"
+    group: "{{ gitlab_group }}"
+    mode: 0700
+  when: gitlab_create_self_signed_cert
+
+- name: create self-signed certificate
+  command: "openssl req -new -nodes -x509 -subj {{ gitlab_self_signed_cert_subj }} -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca"
+  args:
+    creates: "{{ gitlab_ssl_certificate }}"
+  when: gitlab_create_self_signed_cert
+
+- name: manage gitlab configuration
+  template:
+    src: "{{ gitlab_conf_template }}"
+    dest: "{{ gitlab_conf_path }}"
+    owner: "{{ gitlab_user }}"
+    group: "{{ gitlab_group }}"
+    mode: 0600
+  notify: restart gitlab
