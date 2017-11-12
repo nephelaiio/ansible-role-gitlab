@@ -1,11 +1,12 @@
 ---
 # General config.
-gitlab_package_dependency_default:
+gitlab_edition: gitlab-ce  # gitlab-ce | gitlab-ee
+gitlab_package_dependency:
   - openssh-server
   - postfix
   - curl
   - openssl
-gitlab_package_default: gitlab-ce
+gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
 gitlab_conf_path: /etc/gitlab/gitlab.conf
@@ -16,16 +17,16 @@ gitlab_user: root
 gitlab_group: root
 
 # SSL Configuration.
-gitlab_redirect_http_to_https: "true"
+gitlab_redirect_http_to_https: true
 gitlab_ssl_certificate: "/etc/gitlab/ssl/gitlab.crt"
 gitlab_ssl_certificate_key: "/etc/gitlab/ssl/gitlab.key"
 
 # SSL Self-signed Certificate Configuration.
-gitlab_create_self_signed_cert: "true"
+gitlab_create_self_signed_cert: true
 gitlab_self_signed_cert_subj: "/C=US/ST=Missouri/L=Saint Louis/O=IT/CN=gitlab"
 
 # LDAP Configuration.
-gitlab_ldap_enabled: "false"
+gitlab_ldap_enabled: false
 gitlab_ldap_host: "example.com"
 gitlab_ldap_port: "389"
 gitlab_ldap_uid: "sAMAccountName"
@@ -35,15 +36,15 @@ gitlab_ldap_password: "password"
 gitlab_ldap_base: "DC=example,DC=com"
 
 # SMTP Configuration
-gitlab_smtp_enable: "false"
+gitlab_smtp_enable: false
 gitlab_smtp_address: "smtp.server"
 gitlab_smtp_port: "465"
 gitlab_smtp_user_name: "smtp user"
 gitlab_smtp_password: "smtp password"
 gitlab_smtp_domain: "example.com"
 gitlab_smtp_authentication: "login"
-gitlab_smtp_enable_starttls_auto: "true"
-gitlab_smtp_tls: "false"
+gitlab_smtp_enable_starttls_auto: true
+gitlab_smtp_tls: false
 gitlab_smtp_openssl_verify_mode: "none"
 gitlab_smtp_ca_path: "/etc/ssl/certs"
 gitlab_smtp_ca_file: "/etc/ssl/certs/ca-certificates.crt"
@@ -55,10 +56,10 @@ gitlab_nginx_ssl_client_certificate: ""
 # Optional settings.
 gitlab_time_zone: "UTC"
 gitlab_backup_keep_time: "604800"
-gitlab_download_validate_certs: yes
+gitlab_download_validate_certs: false
 
 # Email configuration.
-gitlab_email_enabled: "false"
+gitlab_email_enabled: false
 gitlab_email_from: "gitlab@example.com"
 gitlab_email_display_name: "Gitlab"
 gitlab_email_reply_to: "gitlab@example.com"

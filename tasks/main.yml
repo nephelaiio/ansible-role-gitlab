@@ -21,7 +21,7 @@
     name: "{{ item }}"
     state: installed
   become: yes
-  with_items: "{{ gitlab_package_dependency | default(gitlab_package_dependency_default) }}"
+  with_items: "{{ gitlab_package_dependency }}"
 
 - name: download gitlab repository installation script
   get_url:
@@ -38,7 +38,7 @@
 
 - name: install gitlab
   package:
-    name: "{{ gitlab_package | default(gitlab_package_default) }}"
+    name: "{{ gitlab_package }}"
     state: installed
   when: not gitlab_file.stat.exists
 
