@@ -9,7 +9,7 @@ gitlab_package_dependency:
 gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
-gitlab_conf_path: /etc/gitlab/gitlab.conf
+gitlab_conf_path: /etc/gitlab/gitlab.rb
 gitlab_external_url: "https://gitlab/"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"
 gitlab_backup_path: "/var/opt/gitlab/backups"
