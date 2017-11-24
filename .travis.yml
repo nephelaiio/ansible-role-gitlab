@@ -11,7 +11,9 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - travis_wait 30 molecule test
+  - ansible-playbook /test/test.yml --syntax-check
+  - ansible-playbook /test/test.yml -vvvv
+  - py.test -v test/test_gitlab.py
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

@@ -17,7 +17,7 @@ nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 
 # The directory where Git repositories will be stored.
-git_data_dirs({ "default": { "path": "{{ gitlab_git_data_dir }}" } })
+git_data_dirs({"default" => "{{ gitlab_git_data_dir }}"})
 
 # The directory where Gitlab backups will be stored
 gitlab_rails['backup_path'] = "{{ gitlab_backup_path }}"
@@ -31,16 +31,16 @@ gitlab_rails['ldap_uid'] = '{{ gitlab_ldap_uid }}'
 gitlab_rails['ldap_method'] = '{{ gitlab_ldap_method}}' # 'ssl' or 'plain'
 gitlab_rails['ldap_bind_dn'] = '{{ gitlab_ldap_bind_dn }}'
 gitlab_rails['ldap_password'] = '{{ gitlab_ldap_password }}'
-gitlab_rails['ldap_allow_username_or_email_login'] = "true"
+gitlab_rails['ldap_allow_username_or_email_login'] = true
 gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
 
 # GitLab Nginx
 ## See https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md
 {% if gitlab_nginx_listen_port is defined %}
-nginx['listen_port'] = {{ gitlab_nginx_listen_port }}
+nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
 {% endif %}
 {% if gitlab_nginx_listen_https is defined %}
-nginx['listen_https'] = {{ gitlab_nginx_listen_https }}
+nginx['listen_https'] = "{{ gitlab_nginx_listen_https }}"
 {% endif %}
 
 # Use smtp instead of sendmail/postfix
@@ -65,6 +65,11 @@ nginx['ssl_verify_client'] = "{{ gitlab_nginx_ssl_verify_client }}"
 {% endif %}
 {% if gitlab_nginx_ssl_client_certificate %}
 nginx['ssl_client_certificate'] = "{{ gitlab_nginx_ssl_client_certificate }}"
+{% endif %}
+
+# Mattermost
+{% if gitlab_mattermost_url %}
+mattermost_external_url '{{ gitlab_mattermost_url }}'
 {% endif %}
 
 # To change other settings, see:
