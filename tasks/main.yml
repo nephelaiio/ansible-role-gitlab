@@ -23,16 +23,27 @@
   become: yes
   with_items: "{{ gitlab_package_dependency | default(gitlab_package_dependency_default) }}"
 
+- name: create temporary target directory
+  tempfile:
+    state: directory
+    prefix: iso
+  register: tmpdir
+  changed_when: false
+
+- name: register installation script location
+  set_fact:
+    install_script: "{{ tmpdir.path }}/gitlab_install_repository.sh"
+
 - name: download gitlab repository installation script
   get_url:
     url: "{{ gitlab_repository_installation_script_url }}"
-    dest: /tmp/gitlab_install_repository.sh
+    dest: "{{ install_script }}"
     validate_certs: "{{ gitlab_download_validate_certs }}"
     mode: 755
   when: not gitlab_file.stat.exists
 
 - name: install gitlab repository
-  command: /tmp/gitlab_install_repository.sh
+  command: /"{{ install_script }}"
   when: not gitlab_file.stat.exists
   become: yes
 
@@ -73,3 +84,10 @@
     group: "{{ gitlab_group }}"
     mode: 0600
   notify: restart gitlab
+
+- name: remove temporary directories
+  file:
+    path: "{{ tmpdir.path }}"
+    state: absent
+  become: yes
+  changed_when: false
