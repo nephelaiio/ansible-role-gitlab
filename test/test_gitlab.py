@@ -1,7 +1,8 @@
 def test_reconfigure(host):
-    reconfigure = host.run('gitlab-ctl reconfigure')
-    assert reconfigure.rc == 0
+    assert host.command('sudo gitlab-ctl reconfigure').rc == 0
+    assert host.command('sudo gitlab-ctl restart').rc == 0
+    assert host.command('sudo gitlab-ctl status').rc == 0
 
-def test_service(host):
-    service = host.run('gitlab-ctl status')
-    assert service.rc == 0
+
+def test_socket(Host):
+    assert Host.socket('tcp://0.0.0.0:80').is_listening
