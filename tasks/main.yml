@@ -77,7 +77,7 @@
   when: gitlab_create_self_signed_cert
 
 - name: create self-signed certificate
-  command: "openssl req -new -nodes -x509 -subj {{ gitlab_self_signed_cert_subj }} -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca"
+  command: "openssl req -new -nodes -x509 -subj \"{{ gitlab_self_signed_cert_subj }}\" -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca"
   args:
     creates: "{{ gitlab_ssl_certificate }}"
   become: yes
