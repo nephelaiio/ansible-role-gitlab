@@ -7,9 +7,10 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_command(Host):
-    assert Host.command('gitlab-ctl reconfigure').rc == 0
-    assert Host.command('gitlab-ctl restart').rc == 0
-    assert Host.command('gitlab-ctl status').rc == 0
+    assert Host.command('sudo gitlab-ctl reconfigure').rc == 0
+    assert Host.command('sudo gitlab-ctl restart').rc == 0
+    assert Host.command('sudo gitlab-ctl status').rc == 0
+
 
 def test_socket(Host):
     assert Host.socket('tcp://0.0.0.0:80').is_listening
