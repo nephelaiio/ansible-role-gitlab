@@ -4,5 +4,5 @@ def test_reconfigure(host):
     assert host.command('sudo gitlab-ctl status').rc == 0
 
 
-def test_socket(Host):
-    assert Host.socket('tcp://0.0.0.0:80').is_listening
+def test_socket(host):
+    assert host.socket('tcp://0.0.0.0:80').is_listening
