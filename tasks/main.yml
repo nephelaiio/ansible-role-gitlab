@@ -26,8 +26,9 @@
 - name: create temporary target directory
   tempfile:
     state: directory
-    prefix: iso
+    prefix: gitlab
   register: tmpdir
+  become: yes
   changed_when: false
 
 - name: register installation script location
@@ -41,9 +42,10 @@
     validate_certs: "{{ gitlab_download_validate_certs }}"
     mode: 755
   when: not gitlab_file.stat.exists
+  become: yes
 
 - name: install gitlab repository
-  command: /"{{ install_script }}"
+  command: "{{ install_script }}"
   when: not gitlab_file.stat.exists
   become: yes
 
@@ -51,6 +53,7 @@
   package:
     name: "{{ gitlab_package | default(gitlab_package_default) }}"
     state: installed
+  become: yes
   when: not gitlab_file.stat.exists
 
 # Start and configure GitLab. Sometimes the first run fails, but after that,
@@ -59,7 +62,9 @@
   command: gitlab-ctl reconfigure
   args:
     creates: /var/opt/gitlab/bootstrapped
+  when: not gitlab_file.stat.exists
   failed_when: false
+  become: yes
 
 - name: create gitlab ssl configuration folder
   file:
@@ -68,12 +73,14 @@
     owner: "{{ gitlab_user }}"
     group: "{{ gitlab_group }}"
     mode: 0700
+  become: yes
   when: gitlab_create_self_signed_cert
 
 - name: create self-signed certificate
   command: "openssl req -new -nodes -x509 -subj {{ gitlab_self_signed_cert_subj }} -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca"
   args:
     creates: "{{ gitlab_ssl_certificate }}"
+  become: yes
   when: gitlab_create_self_signed_cert
 
 - name: manage gitlab configuration
@@ -83,6 +90,7 @@
     owner: "{{ gitlab_user }}"
     group: "{{ gitlab_group }}"
     mode: 0600
+  become: yes
   notify: restart gitlab
 
 - name: remove temporary directories
