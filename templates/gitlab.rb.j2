@@ -12,8 +12,8 @@ gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 {% endif %}
 
 # Whether to redirect http to https.
-{% if gitlab_redirect_http_to_https == "true" %}
 nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
+{% if gitlab_redirect_http_to_https == "true" %}
 nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 {% endif %}
