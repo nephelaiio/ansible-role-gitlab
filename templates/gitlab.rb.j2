@@ -12,9 +12,11 @@ gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 {% endif %}
 
 # Whether to redirect http to https.
+{% if gitlab_redirect_http_to_https == "true" %}
 nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
 nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
+{% endif %}
 
 # The directory where Git repositories will be stored.
 git_data_dirs({"default" => "{{ gitlab_git_data_dir }}"})
@@ -60,7 +62,7 @@ gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
 gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 
 # 2-way SSL Client Authentication.
-{% if gitlab_nginx_ssl_verify_client %}
+{% if gitlab_nginx_ssl_verify_client != '' %}
 nginx['ssl_verify_client'] = "{{ gitlab_nginx_ssl_verify_client }}"
 {% endif %}
 {% if gitlab_nginx_ssl_client_certificate %}
@@ -68,7 +70,7 @@ nginx['ssl_client_certificate'] = "{{ gitlab_nginx_ssl_client_certificate }}"
 {% endif %}
 
 # Mattermost
-{% if gitlab_mattermost_url %}
+{% if gitlab_mattermost_url != '' %}
 mattermost_external_url '{{ gitlab_mattermost_url }}'
 {% endif %}
 

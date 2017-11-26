@@ -17,7 +17,7 @@ gitlab_user: root
 gitlab_group: root
 
 # SSL Configuration.
-gitlab_redirect_http_to_https: "true"
+gitlab_redirect_http_to_https: "false"
 gitlab_ssl_certificate: "/etc/gitlab/ssl/gitlab.crt"
 gitlab_ssl_certificate_key: "/etc/gitlab/ssl/gitlab.key"
 
