@@ -1,6 +1,12 @@
 # The URL through which GitLab will be accessed.
 external_url "{{ gitlab_external_url }}"
 
+git_data_dirs({
+  "default": {
+      "path": "/var/opt/gitlab/git-data"
+        }
+        })
+
 # gitlab.yml configuration
 gitlab_rails['time_zone'] = "{{ gitlab_time_zone }}"
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
@@ -19,7 +25,7 @@ nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 {% endif %}
 
 # The directory where Git repositories will be stored.
-git_data_dirs({"default" => "{{ gitlab_git_data_dir }}"})
+git_data_dirs({ "default" => { "path" => "{{ gitlab_git_data_dir }}" } })
 
 # The directory where Gitlab backups will be stored
 gitlab_rails['backup_path'] = "{{ gitlab_backup_path }}"
