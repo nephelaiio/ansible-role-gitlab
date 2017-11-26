@@ -9,6 +9,7 @@ services:
 
 install:
   - pip install -r requirements.txt
+  - ln -s ../../ test/roles/nephelaiio.gitlab
 
 script:
   - ansible-playbook test/test.yml --syntax-check
