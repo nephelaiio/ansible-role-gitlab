@@ -6,7 +6,7 @@ gitlab_package_dependency:
   - postfix
   - curl
   - openssl
-  - update-ca-certificates
+  - ca-certificates
 gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
