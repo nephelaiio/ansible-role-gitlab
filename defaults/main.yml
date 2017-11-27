@@ -6,6 +6,7 @@ gitlab_package_dependency:
   - postfix
   - curl
   - openssl
+  - update-ca-certificates
 gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
@@ -47,7 +48,7 @@ gitlab_smtp_enable_starttls_auto: "true"
 gitlab_smtp_tls: "false"
 gitlab_smtp_openssl_verify_mode: "none"
 gitlab_smtp_ca_path: "/etc/ssl/certs"
-gitlab_smtp_ca_file: "/etc/ssl/certs/ca-certificates.crt"
+gitlab_smtp_ca_file: "{{ gitlab_smtp_ca_path }}/ca-certificates.crt"
 
 # 2-way SSL Client Authentication support.
 gitlab_nginx_ssl_verify_client: ""

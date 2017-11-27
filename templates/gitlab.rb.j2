@@ -1,12 +1,6 @@
 # The URL through which GitLab will be accessed.
 external_url "{{ gitlab_external_url }}"
 
-git_data_dirs({
-  "default": {
-      "path": "/var/opt/gitlab/git-data"
-        }
-        })
-
 # gitlab.yml configuration
 gitlab_rails['time_zone'] = "{{ gitlab_time_zone }}"
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
@@ -19,10 +13,8 @@ gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 
 # Whether to redirect http to https.
 nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
-{% if gitlab_redirect_http_to_https == "true" %}
 nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
-{% endif %}
 
 # The directory where Git repositories will be stored.
 git_data_dirs({ "default" => { "path" => "{{ gitlab_git_data_dir }}" } })
@@ -64,6 +56,8 @@ gitlab_rails['smtp_authentication'] = '{{ gitlab_smtp_authentication }}'
 gitlab_rails['smtp_enable_starttls_auto'] = {{ gitlab_smtp_enable_starttls_auto }}
 gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
 gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }}'
+gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
+gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 
 # 2-way SSL Client Authentication.
 {% if gitlab_nginx_ssl_verify_client != '' %}
