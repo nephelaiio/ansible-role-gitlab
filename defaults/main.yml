@@ -48,6 +48,8 @@ gitlab_time_zone: "UTC"
 gitlab_backup_keep_time: "604800"
 gitlab_download_validate_certs: "false"
 #gitlab_mattermost_url: "http://mattermost"
+gitlab_mattermost_listen_port: 8065
+gitlab_mattermost_listen_addresses: ['127.0.0.1']
 
 # Email configuration.
 gitlab_email_enabled: "false"

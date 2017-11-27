@@ -4,6 +4,8 @@ external_url "{{ gitlab_external_url }}"
 # The URL through whith GiLab's embedded Mattermost will be accessed
 {% if gitlab_mattermost_url is defined %}
 mattermost_external_url '{{ gitlab_mattermost_url }}'
+mattermost_nginx['listen_port'] = {{ gitlab_mattermost_listen_port }}
+mattermost_nginx['listen_addresses'] = {{ gitlab_mattermost_listen_addresses }}
 {% endif %}
 
 # gitlab.yml configuration
