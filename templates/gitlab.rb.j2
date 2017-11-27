@@ -1,5 +1,10 @@
-# The URL through which GitLab will be accessed.
+# The URL through which GitLab will be accessed
 external_url "{{ gitlab_external_url }}"
+
+# The URL through whith GiLab's embedded Mattermost will be accessed
+{% if gitlab_mattermost_url is defined %}
+mattermost_external_url '{{ gitlab_mattermost_url }}'
+{% endif %}
 
 # gitlab.yml configuration
 gitlab_rails['time_zone'] = "{{ gitlab_time_zone }}"
@@ -12,9 +17,7 @@ gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 {% endif %}
 
 # Whether to redirect http to https.
-nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
-nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
-nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
+nginx['redirect_http_to_https'] = false
 
 # The directory where Git repositories will be stored.
 git_data_dirs({ "default" => { "path" => "{{ gitlab_git_data_dir }}" } })
@@ -39,9 +42,7 @@ gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
 {% if gitlab_nginx_listen_port is defined %}
 nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
 {% endif %}
-{% if gitlab_nginx_listen_https is defined %}
-nginx['listen_https'] = "{{ gitlab_nginx_listen_https }}"
-{% endif %}
+nginx['listen_https'] = false
 
 # Use smtp instead of sendmail/postfix
 # More details and example configuration at
@@ -58,19 +59,6 @@ gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
 gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }}'
 gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
 gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
-
-# 2-way SSL Client Authentication.
-{% if gitlab_nginx_ssl_verify_client != '' %}
-nginx['ssl_verify_client'] = "{{ gitlab_nginx_ssl_verify_client }}"
-{% endif %}
-{% if gitlab_nginx_ssl_client_certificate %}
-nginx['ssl_client_certificate'] = "{{ gitlab_nginx_ssl_client_certificate }}"
-{% endif %}
-
-# Mattermost
-{% if gitlab_mattermost_url != '' %}
-mattermost_external_url '{{ gitlab_mattermost_url }}'
-{% endif %}
 
 # To change other settings, see:
 # https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#changing-gitlab-yml-settings

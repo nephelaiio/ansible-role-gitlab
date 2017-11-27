@@ -11,20 +11,13 @@ gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
 gitlab_conf_path: /etc/gitlab/gitlab.rb
-gitlab_external_url: "https://gitlab/"
+gitlab_external_url: "http://gitlab/"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"
 gitlab_backup_path: "/var/opt/gitlab/backups"
-gitlab_user: root
-gitlab_group: root
-
-# SSL Configuration.
-gitlab_redirect_http_to_https: "false"
-gitlab_ssl_certificate: "/etc/gitlab/ssl/gitlab.crt"
-gitlab_ssl_certificate_key: "/etc/gitlab/ssl/gitlab.key"
-
-# SSL Self-signed Certificate Configuration.
-gitlab_create_self_signed_cert: "true"
-gitlab_self_signed_cert_subj: "/C=US/ST=Missouri/L=Saint Louis/O=IT/CN=gitlab"
+gitlab_user:  root
+gitlab_group:  root
+gitlab_www_user: gitlab-www
+gitlab_www_group: gitlab-www
 
 # LDAP Configuration.
 gitlab_ldap_enabled: "false"
@@ -49,10 +42,6 @@ gitlab_smtp_tls: "false"
 gitlab_smtp_openssl_verify_mode: "none"
 gitlab_smtp_ca_path: "/etc/ssl/certs"
 gitlab_smtp_ca_file: "{{ gitlab_smtp_ca_path }}/ca-certificates.crt"
-
-# 2-way SSL Client Authentication support.
-gitlab_nginx_ssl_verify_client: ""
-gitlab_nginx_ssl_client_certificate: ""
 
 # Optional settings.
 gitlab_time_zone: "UTC"

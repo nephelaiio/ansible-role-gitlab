@@ -66,28 +66,11 @@
   failed_when: false
   become: yes
 
-- name: create gitlab ssl configuration folder
-  file:
-    path: /etc/gitlab/ssl
-    state: directory
-    owner: "{{ gitlab_user }}"
-    group: "{{ gitlab_group }}"
-    mode: 0700
-  become: yes
-  when: gitlab_create_self_signed_cert
-
 - name: update ca certificates
   command: update-ca-certificates
   args:
     creates: "{{ gitlab_smtp_ca_file }}"
   become: yes
-
-- name: create self-signed certificate
-  command: "openssl req -new -nodes -x509 -subj \"{{ gitlab_self_signed_cert_subj }}\" -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca"
-  args:
-    creates: "{{ gitlab_ssl_certificate }}"
-  become: yes
-  when: gitlab_create_self_signed_cert
 
 - name: manage gitlab configuration
   template:
