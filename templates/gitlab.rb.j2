@@ -18,6 +18,15 @@ registry['enable'] = {{ gitlab_registry_enable | default(true) }}
 registry['registry_http_addr'] = "{{ gitlab_registry_listen_address | default('localhost') }}: {{ gitlab_registry_listen_port | default(5000) }}"
 {% endif %}
 mattermost_nginx['enable'] = {{ gitlab_registry_nginx_enable | default('false') }}
+{% if gitlab_pages_url is defined %}
+pages_external_url '{{ gitlab_pages_url }}'
+gitlab_pages['enable'] = {{ gitlab_pages_enable | default(true) }}
+{% if gitlab_pages_listen_address is defined %}
+gitlab_pages['external_http'] = [ '{{ gitlab_pages_listen_address }}:{{ gitlab_pages_listen_port | default(8880) }}' ]
+{% endif %}
+{% endif %}
+gitlab_pages['enable'] = {{ gitlab_pages_nginx_enable | default('false') }}
+
 
 # gitlab.yml configuration
 gitlab_rails['time_zone'] = "{{ gitlab_time_zone }}"
