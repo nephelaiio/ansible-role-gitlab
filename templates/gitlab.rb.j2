@@ -16,7 +16,7 @@ mattermost['email_enable_sign_up_with_email'] = {{ gitlab_mattermost_enable_emai
 {% if gitlab_registry_url is defined %}
 registry_external_url '{{ gitlab_registry_url }}'
 registry['enable'] = {{ gitlab_registry_enable | default('true') }}
-registry['registry_http_addr'] = "{{ gitlab_registry_listen_address | default('localhost') }}: {{ gitlab_registry_listen_port | default(5000) }}"
+registry['registry_http_addr'] = "{{ gitlab_registry_listen_address | default('localhost') }}:{{ gitlab_registry_listen_port | default(5000) }}"
 {% endif %}
 registry_nginx['enable'] = {{ gitlab_registry_nginx_enable | default('false') }}
 
