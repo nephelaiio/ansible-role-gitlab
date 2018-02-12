@@ -13,6 +13,7 @@ gitlab_conf_template: gitlab.rb.j2
 gitlab_conf_path: /etc/gitlab/gitlab.rb
 gitlab_external_url: "http://gitlab/"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"
+gitlab_manage_backup_path: "true"
 gitlab_backup_path: "/var/opt/gitlab/backups"
 gitlab_user:  root
 gitlab_group:  root

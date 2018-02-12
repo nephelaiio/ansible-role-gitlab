@@ -45,7 +45,8 @@ nginx['redirect_http_to_https'] = false
 # The directory where Git repositories will be stored.
 git_data_dirs({ "default" => { "path" => "{{ gitlab_git_data_dir }}" } })
 
-# The directory where Gitlab backups will be stored
+# Backup settings
+gitlab_rails['manage_backup_path'] = {{ gitlab_manage_backup_path | default('true') }}
 gitlab_rails['backup_path'] = "{{ gitlab_backup_path }}"
 
 # These settings are documented in more detail at
