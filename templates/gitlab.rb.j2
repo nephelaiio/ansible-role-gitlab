@@ -11,7 +11,6 @@ mattermost_nginx['enable'] = {{ gitlab_mattermost_nginx_enable | default('false'
 mattermost['enable'] = {{ gitlab_mattermost_enable | default('true') }}
 mattermost['service_address'] = "{{ gitlab_mattermost_listen_address | default() }}"
 mattermost['service_port'] = {{ gitlab_mattermost_listen_port | default(8065) }}
-mattermost['email_enable_sign_up_with_email'] = {{ gitlab_mattermost_enable_email_signup }}
 
 {% if gitlab_registry_url is defined %}
 registry_external_url '{{ gitlab_registry_url }}'

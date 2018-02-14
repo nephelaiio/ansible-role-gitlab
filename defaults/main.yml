@@ -52,7 +52,6 @@ gitlab_download_validate_certs: "false"
 gitlab_mattermost_listen_port: 8065
 gitlab_mattermost_listen_addresses:
   - "'127.0.0.1'"
-gitlab_mattermost_enable_email_signup: "false"
 
 # Email configuration.
 gitlab_email_enabled: "false"
