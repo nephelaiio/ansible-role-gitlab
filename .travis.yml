@@ -1,5 +1,7 @@
 # vim: ts=2 sw=2 et :
 ---
+dist: xenial
+
 language: python
 
 sudo: required
