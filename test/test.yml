@@ -3,6 +3,8 @@
 
   hosts: localhost
 
+  become: yes
+
   roles:
 
     - role: nephelaiio.gitlab
