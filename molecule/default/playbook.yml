@@ -1,6 +1,6 @@
 ---
 - name: Converge
   hosts: all
-  sudo: yes
+  become: yes
   roles:
     - role: gitlab
