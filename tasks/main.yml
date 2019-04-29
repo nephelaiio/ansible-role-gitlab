@@ -16,10 +16,15 @@
   stat: path=/usr/bin/gitlab-ctl
   register: gitlab_file
 
+- name: update apt package cache
+  apt:
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
+
 - name: install gitlab dependencies
   package:
     name: "{{ item }}"
-    state: installed
+    state: present
   become: yes
   with_items: "{{ gitlab_package_dependency | default(gitlab_package_dependency_default) }}"
 
@@ -52,7 +57,7 @@
 - name: install gitlab
   package:
     name: "{{ gitlab_package | default(gitlab_package_default) }}"
-    state: installed
+    state: present
   become: yes
   when: not gitlab_file.stat.exists
 
