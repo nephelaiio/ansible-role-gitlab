@@ -25,7 +25,6 @@
   package:
     name: "{{ item }}"
     state: present
-  become: yes
   with_items: "{{ gitlab_package_dependency | default(gitlab_package_dependency_default) }}"
 
 - name: create temporary target directory
@@ -33,7 +32,6 @@
     state: directory
     prefix: gitlab
   register: tmpdir
-  become: yes
   changed_when: false
 
 - name: register installation script location
@@ -47,18 +45,15 @@
     validate_certs: "{{ gitlab_download_validate_certs }}"
     mode: 755
   when: not gitlab_file.stat.exists
-  become: yes
 
 - name: install gitlab repository
   command: "{{ install_script }}"
   when: not gitlab_file.stat.exists
-  become: yes
 
 - name: install gitlab
   package:
     name: "{{ gitlab_package | default(gitlab_package_default) }}"
     state: present
-  become: yes
   when: not gitlab_file.stat.exists
 
 # Start and configure GitLab. Sometimes the first run fails, but after that,
@@ -69,13 +64,11 @@
     creates: /var/opt/gitlab/bootstrapped
   when: not gitlab_file.stat.exists
   failed_when: false
-  become: yes
 
 - name: update ca certificates
   command: update-ca-certificates
   args:
     creates: "{{ gitlab_smtp_ca_file }}"
-  become: yes
 
 - name: manage gitlab configuration
   template:
@@ -84,12 +77,10 @@
     owner: "{{ gitlab_user }}"
     group: "{{ gitlab_group }}"
     mode: 0600
-  become: yes
   notify: restart gitlab
 
 - name: remove temporary directories
   file:
     path: "{{ tmpdir.path }}"
     state: absent
-  become: yes
   changed_when: false
