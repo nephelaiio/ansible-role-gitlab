@@ -14,7 +14,7 @@ install:
 
 script:
   - ansible-playbook test/test.yml --syntax-check
-  - ansible-playbook test/test.yml -vvvv
+  - ansible-playbook test/test.yml
   - py.test -v test/test_gitlab.py
 
 notifications:
