@@ -15,12 +15,6 @@ install:
 script:
   - ansible-playbook test/test.yml --syntax-check
   - ansible-playbook test/test.yml
-  - sudo gitlab-ctl status
-  - sudo gitlab-ctl restart
-  - sudo gitlab-ctl status
-  - sudo gitlab-ctl reconfigure
-  - sudo gitlab-ctl restart
-  - sudo gitlab-ctl status
   - py.test -v test/test_gitlab.py
 
 notifications:
