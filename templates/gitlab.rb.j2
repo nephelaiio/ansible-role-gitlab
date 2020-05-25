@@ -83,5 +83,10 @@ gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }
 gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
 gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 
+# SSH
+{% if gitlab_ssh_listen_port is defined %}
+gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_listen_port }}
+{% endif %}
+
 # To change other settings, see:
 # https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#changing-gitlab-yml-settings

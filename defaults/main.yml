@@ -44,6 +44,9 @@ gitlab_smtp_openssl_verify_mode: "none"
 gitlab_smtp_ca_path: "/etc/ssl/certs"
 gitlab_smtp_ca_file: "{{ gitlab_smtp_ca_path }}/ca-certificates.crt"
 
+# SSH configuration
+gitlab_ssh_listen_port: 8022
+
 # Optional settings.
 gitlab_time_zone: "UTC"
 gitlab_backup_keep_time: "604800"
