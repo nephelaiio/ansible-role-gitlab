@@ -54,7 +54,6 @@
   package:
     name: "{{ gitlab_package | default(gitlab_package_default) }}"
     state: present
-  when: not gitlab_file.stat.exists
 
 # Start and configure GitLab. Sometimes the first run fails, but after that,
 # restarts fix problems, so ignore failures on this run.
