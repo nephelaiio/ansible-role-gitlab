@@ -11,6 +11,7 @@ gitlab_requirements_default:
     - curl
     - openssl
     - ca-certificates
+    - tzdata
     - gpg
     - gpg-agent
   redhat:
@@ -19,6 +20,7 @@ gitlab_requirements_default:
     - curl
     - openssl
     - ca-certificates
+    - tzdata
 gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
