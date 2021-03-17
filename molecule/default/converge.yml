@@ -1,0 +1,23 @@
+---
+- name: converge
+
+  hosts: all
+
+  roles:
+
+    - role: nephelaiio.gitlab
+
+  pre_tasks:
+
+    - name: update apt cache
+      apt:
+        update_cache: true
+      when: ansible_os_family | lower == 'debian'
+      failed_when: false
+      ignore_errors: true
+      changed_when: false
+
+    - name: remove dockerenv
+      file:
+        path: /.dockerenv
+        state: absent

@@ -1,0 +1,45 @@
+---
+- name: verify
+
+  hosts: all
+
+  become: yes
+
+  tasks:
+
+    - name: verify frontpage redirect
+      uri:
+        url: http://localhost
+        follow_redirects: none
+        status_code: 302
+      register: _frontpage_redirect
+      until: _frontpage_redirect is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify frontpage content
+      uri:
+        url: http://localhost
+        status_code: 200
+      register: _frontpage_content
+      until: _frontpage_content is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify reconfigure command
+      command: gitlab-ctl reconfigure
+
+    - name: verify restart command
+      command: gitlab-ctl restart
+
+    - name: verify frontpage content
+      uri:
+        url: http://localhost
+        status_code: 200
+      register: _frontpage_content
+      until: _frontpage_content is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify status command
+      command: gitlab-ctl status

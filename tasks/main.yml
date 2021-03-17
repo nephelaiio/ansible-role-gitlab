@@ -1,31 +1,36 @@
 ---
-- name: include variable overrides
-  include_vars: "{{ item }}"
-  with_first_found:
-    - files:
-        - "vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-        - "vars/{{ ansible_distribution }}.yml"
-        - "vars/{{ ansible_os_family }}.yml"
-      skip: true
+- name: set variable overrides
+  set_fact:
+    _gitlab_requirements: "{{ gitlab_requirements | default(gitlab_requirements_default | sorted_get(overrides)) }}"
+  vars:
+    overrides:
+      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}"
+      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
+      - "{{ ansible_distribution | lower }}"
+      - "{{ ansible_os_family | lower }}"
+      - "default"
+  tags:
+    - always
+
+- name: load installation script url
+  set_fact:
+    gitlab_repository_installation_script_url: "{{ gitlab_repository_installation_script_url_default[ansible_os_family | lower] }}"
+  when: gitlab_repository_installation_script_url is not defined
 
 - name: check existing configuration
-  stat: path=/etc/gitlab/gitlab.rb
+  stat:
+    path: /etc/gitlab/gitlab.rb
   register: gitlab_config_file
 
 - name: check existing installation
-  stat: path=/usr/bin/gitlab-ctl
+  stat:
+    path: /usr/bin/gitlab-ctl
   register: gitlab_file
-
-- name: update apt package cache
-  apt:
-    update_cache: yes
-  when: ansible_os_family == 'Debian'
 
 - name: install gitlab dependencies
   package:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ gitlab_package_dependency | default(gitlab_package_dependency_default) }}"
+    name: "{{ _gitlab_requirements }}"
+    state: "{{ gitlab_package_state }}"
 
 - name: create temporary target directory
   tempfile:
@@ -50,19 +55,28 @@
   command: "{{ install_script }}"
   when: not gitlab_file.stat.exists
 
+- name: import apt gpg key
+  apt_key:
+    url: https://packages.gitlab.com/gpg.key
+
+- name: update apt package cache
+  apt:
+    update_cache: true
+  when: ansible_os_family | lower == 'debian'
+
 - name: install gitlab
   package:
     name: "{{ gitlab_package | default(gitlab_package_default) }}"
-    state: present
+  notify: restart gitlab-runsvdir service
 
-# Start and configure GitLab. Sometimes the first run fails, but after that,
-# restarts fix problems, so ignore failures on this run.
+- name: flush handlers
+  meta: flush_handlers
+
 - name: reconfigure gitlab (first run)
   command: gitlab-ctl reconfigure
   args:
     creates: /var/opt/gitlab/bootstrapped
   when: not gitlab_file.stat.exists
-  failed_when: false
 
 - name: update ca certificates
   command: update-ca-certificates
@@ -76,7 +90,7 @@
     owner: "{{ gitlab_user }}"
     group: "{{ gitlab_group }}"
     mode: 0600
-  notify: restart gitlab
+  notify: reconfigure gitlab
 
 - name: remove temporary directories
   file:

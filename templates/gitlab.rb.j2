@@ -1,17 +1,6 @@
 # The URL through which GitLab will be accessed
 external_url "{{ gitlab_external_url }}"
 
-# The URL through whith GitLab's embedded Mattermost will be accessed
-{% if gitlab_mattermost_url is defined %}
-mattermost_external_url '{{ gitlab_mattermost_url }}'
-mattermost_nginx['listen_port'] = {{ gitlab_mattermost_listen_port | default(8065) }}
-mattermost_nginx['listen_addresses'] = [ {{ gitlab_mattermost_listen_addresses | map('string') | list | join(', ') }} ]
-{% endif %}
-mattermost_nginx['enable'] = {{ gitlab_mattermost_nginx_enable | default('false') }}
-mattermost['enable'] = {{ gitlab_mattermost_enable | default('true') }}
-mattermost['service_address'] = "{{ gitlab_mattermost_listen_address | default() }}"
-mattermost['service_port'] = {{ gitlab_mattermost_listen_port | default(8065) }}
-
 {% if gitlab_registry_url is defined %}
 registry_external_url '{{ gitlab_registry_url }}'
 registry['enable'] = {{ gitlab_registry_enable | default('true') }}
@@ -87,6 +76,8 @@ gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 {% if gitlab_ssh_listen_port is defined %}
 gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_listen_port }}
 {% endif %}
+
+{{ gitlab_config_extra }}
 
 # To change other settings, see:
 # https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#changing-gitlab-yml-settings

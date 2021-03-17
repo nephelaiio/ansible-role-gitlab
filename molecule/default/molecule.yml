@@ -3,34 +3,20 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
 platforms:
-  - name: centos
-    image: centos/systemd:latest
-    privileged: True
-    command: /usr/sbin/init
-    volume_mounts:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - name: ubuntu
-    image: solita/ubuntu-systemd:latest
-    privileged: True
-    command: /sbin/init
-    volume_mounts:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
-  - name: debian
-    image: debian:stretch
-    privileged: True
-    command: /sbin/init
-    volume_mounts:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  - name: instance
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
+  log: true
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
 scenario:
   name: default
 verifier:
-  name: testinfra
-  lint:
-    name: flake8
+  name: ansible

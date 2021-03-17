@@ -1,17 +1,25 @@
 ---
 galaxy_info:
+  role_name: gitlab
+  namespace: nephelaiio
   author: Ted Cook
   description: An Ansible role to install and configure gitlab
   license: MIT
   min_ansible_version: 2.2
   platforms:
+    - name: EL
+      versions:
+        - 7
     - name: Ubuntu
       versions:
-        - xenial
+        - focal
+        - bionic
     - name: Debian
       versions:
-        - stretch
-  galaxy_tags:
-    - gitlab
+        - buster
 
-dependencies: []
+  galaxy_tags:
+    - git
+
+dependencies:
+  - role: nephelaiio.plugins

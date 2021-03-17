@@ -1,12 +1,24 @@
 ---
 # General config.
+gitlab_repository_installation_script_url_default:
+  debian: 'https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.deb.sh'
+  redhat: 'https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.rpm.sh'
 gitlab_edition: gitlab-ce  # gitlab-ce | gitlab-ee
-gitlab_package_dependency:
-  - openssh-server
-  - postfix
-  - curl
-  - openssl
-  - ca-certificates
+gitlab_requirements_default:
+  debian:
+    - openssh-server
+    - postfix
+    - curl
+    - openssl
+    - ca-certificates
+    - gpg
+    - gpg-agent
+  redhat:
+    - openssh-server
+    - postfix
+    - curl
+    - openssl
+    - ca-certificates
 gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
@@ -15,8 +27,8 @@ gitlab_external_url: "http://gitlab/"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"
 gitlab_manage_backup_path: "true"
 gitlab_backup_path: "/var/opt/gitlab/backups"
-gitlab_user:  root
-gitlab_group:  root
+gitlab_user: root
+gitlab_group: root
 gitlab_www_user: gitlab-www
 gitlab_www_group: gitlab-www
 
@@ -51,13 +63,11 @@ gitlab_ssh_listen_port: 8022
 gitlab_time_zone: "UTC"
 gitlab_backup_keep_time: "604800"
 gitlab_download_validate_certs: "false"
-#gitlab_mattermost_url: "http://mattermost"
-gitlab_mattermost_listen_port: 8065
-gitlab_mattermost_listen_addresses:
-  - "'127.0.0.1'"
 
 # Email configuration.
 gitlab_email_enabled: "false"
 gitlab_email_from: "gitlab@example.com"
 gitlab_email_display_name: "Gitlab"
 gitlab_email_reply_to: "gitlab@example.com"
+
+gitlab_config_extra: ''
