@@ -55,13 +55,16 @@
   command: "{{ install_script }}"
   when: not gitlab_file.stat.exists
 
-- name: import apt gpg key
-  apt_key:
-    url: https://packages.gitlab.com/gpg.key
+- block:
 
-- name: update apt package cache
-  apt:
-    update_cache: true
+    - name: import apt gpg key
+      apt_key:
+        url: https://packages.gitlab.com/gpg.key
+
+    - name: update apt package cache
+      apt:
+        update_cache: true
+
   when: ansible_os_family | lower == 'debian'
 
 - name: install gitlab
