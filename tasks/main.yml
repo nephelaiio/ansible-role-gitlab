@@ -65,6 +65,9 @@
       apt:
         update_cache: true
 
+    - name: update ca certificates
+      command: update-ca-certificates
+
   when: ansible_os_family | lower == 'debian'
 
 - name: install gitlab
@@ -80,11 +83,6 @@
   args:
     creates: /var/opt/gitlab/bootstrapped
   when: not gitlab_file.stat.exists
-
-- name: update ca certificates
-  command: update-ca-certificates
-  args:
-    creates: "{{ gitlab_smtp_ca_file }}"
 
 - name: manage gitlab configuration
   template:
