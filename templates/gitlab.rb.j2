@@ -54,7 +54,7 @@ gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
 {% if gitlab_nginx_listen_port is defined %}
 nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
 {% endif %}
-nginx['listen_https'] = false
+nginx['listen_https'] = '{{ gitlab_listen_https }}'
 
 # Use smtp instead of sendmail/postfix
 # More details and example configuration at
