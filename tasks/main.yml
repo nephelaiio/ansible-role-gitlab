@@ -67,6 +67,7 @@
 
     - name: update ca certificates
       command: update-ca-certificates
+      changed_when: false
 
   when: ansible_os_family | lower == 'debian'
 
