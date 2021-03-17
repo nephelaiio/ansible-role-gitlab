@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: gitlab
   namespace: nephelaiio
-  author: Ted Cook
+  author: nephelaiio
   description: An Ansible role to install and configure gitlab
   license: MIT
   min_ansible_version: 2.2
