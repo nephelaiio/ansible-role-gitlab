@@ -33,7 +33,7 @@ gitlab_user: root
 gitlab_group: root
 gitlab_www_user: gitlab-www
 gitlab_www_group: gitlab-www
-gitlab_listen_https: "true"
+gitlab_listen_https: "false"
 
 # LDAP Configuration.
 gitlab_ldap_enabled: "false"
