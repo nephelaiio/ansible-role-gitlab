@@ -99,3 +99,53 @@
     path: "{{ tmpdir.path }}"
     state: absent
   changed_when: false
+
+- block:
+
+    - name: create gitlab backup script
+      template:
+        src: "{{ gitlab_backup_template }}"
+        dest: "{{ gitlab_backup_bin }}"
+        owner: root
+        group: root
+        mode: 0750
+
+    - name: create gitlab restore script
+      template:
+        src: "{{ gitlab_restore_template }}"
+        dest: "{{ gitlab_restore_bin }}"
+        owner: root
+        group: root
+        mode: 0750
+
+    - name: manage gitlab backup cronjob
+      cron:
+        name: gitlab-backup-create
+        job: "{{ gitlab_backup_bin }}"
+        special_time: hourly
+
+    - name: create gitlab backup motd pointers for debian
+      copy:
+        dest: /etc/update-motd.d/99-gitlab
+        content: |
+          #!/usr/bin/env bash
+          echo
+          echo run gitlab-backup to manually force gitlab backup creation
+          echo run gitlab-restore to manually restore latest gitlab backup
+          echo
+        mode: 0755
+      when: ansible_os_family | lower == 'debian'
+
+    - name: create gitlab backup motd pointers for redhat
+      copy:
+        dest: /etc/profile.d/99-gitlab
+        content: |
+          #!/usr/bin/env bash
+          echo
+          echo run gitlab-backup to manually force gitlab backup creation
+          echo run gitlab-restore to manually restore latest gitlab backup
+          echo
+        mode: 0755
+      when: ansible_os_family | lower == 'redhat'
+
+  when: gitlab_backup | default(True)

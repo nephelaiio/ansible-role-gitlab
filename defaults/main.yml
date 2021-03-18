@@ -14,6 +14,7 @@ gitlab_requirements_default:
     - tzdata
     - gpg
     - gpg-agent
+    - cron
   redhat:
     - openssh-server
     - postfix
@@ -21,6 +22,7 @@ gitlab_requirements_default:
     - openssl
     - ca-certificates
     - tzdata
+    - cronie
 gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
@@ -29,11 +31,16 @@ gitlab_external_url: "http://gitlab/"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"
 gitlab_manage_backup_path: "true"
 gitlab_backup_path: "/var/opt/gitlab/backups"
+gitlab_backup_source: "/etc/gitlab /etc/ssh"
+gitlab_backup_template: gitlab-backup.sh.j2
+gitlab_restore_template: gitlab-restore.sh.j2
+gitlab_backup_bin: /usr/local/bin/gitlab-backup
+gitlab_restore_bin: /usr/local/bin/gitlab-restore
 gitlab_user: root
 gitlab_group: root
 gitlab_www_user: gitlab-www
 gitlab_www_group: gitlab-www
-gitlab_listent_https: "true"
+gitlab_listen_https: "true"
 
 # LDAP Configuration.
 gitlab_ldap_enabled: "false"

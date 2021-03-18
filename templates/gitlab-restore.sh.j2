@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+#{{ ansible_managed}}
+
+# find latest data backup file
+unset -v latest_data
+for file in $(find {{ gitlab_backup_path }} -type f -name "*gitlab_backup.tar")
+do
+  [[ $file -nt $latest_data ]] && latest_data=$file
+done
+
+# find latest config backup file
+unset -v latest_config
+for file in $(find {{ gitlab_backup_path }} -type f -name "*gitlab_config.tgz")
+do
+  [[ $file -nt $latest_config ]] && latest_config=$file
+done
+
+# stop services
+gitlab-ctl stop unicorn
+gitlab-ctl stop sidekiq
+
+# restore application backup
+latest_prefix=$(echo $latest_config | sed 's/_gitlab_config.tgz//')
+force=yes gitlab-rake gitlab:backup:restore RAILS_ENV=production BACKUP=$latest_prefix
+
+# stop services
+gitlab-ctl stop
+
+# restore file backup
+tar xvzf $latest_config -C /
+
+# start services
+gitlab-ctl start

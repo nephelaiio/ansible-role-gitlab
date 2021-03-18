@@ -1,0 +1,26 @@
+---
+- name: backup and restore
+
+  hosts: all
+
+  become: yes
+
+  tasks:
+
+    - name: take gitlab backup
+      command: /usr/local/bin/gitlab-backup
+      register: backup_cmd
+
+    - name: delete gitlab configuration files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/gitlab/gitlab.rb
+        - /etc/gitlab/gitlab-secrets.json
+
+    - name: perform gitlab restore
+      command: /usr/local/bin/gitlab-restore
+
+    - name: verify status command
+      command: gitlab-ctl status
