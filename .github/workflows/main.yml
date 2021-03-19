@@ -11,7 +11,7 @@ on:
 
 defaults:
   run:
-    working-directory: 'carlosgo13.gitlab'
+    working-directory: 'nephelaiio.gitlab'
 
 jobs:
 
@@ -22,7 +22,7 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'carlosgo13.gitlab'
+          path: 'nephelaiio.gitlab'
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
@@ -50,7 +50,7 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'carlosgo13.gitlab'
+          path: 'nephelaiio.gitlab'
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
