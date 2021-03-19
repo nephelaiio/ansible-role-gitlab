@@ -18,17 +18,19 @@ done
 
 # stop services
 gitlab-ctl stop unicorn
+gitlab-ctl stop puma
 gitlab-ctl stop sidekiq
 
 # restore application backup
-latest_prefix=$(echo $latest_config | sed 's/_gitlab_config.tgz//')
+latest_prefix=$(echo $latest_data | sed 's/_gitlab_backup.tar//')
+gitlab-ctl reconfigure
 force=yes gitlab-rake gitlab:backup:restore RAILS_ENV=production BACKUP=$latest_prefix
-
-# stop services
-gitlab-ctl stop
 
 # restore file backup
 tar xvzf $latest_config -C /
 
 # start services
-gitlab-ctl start
+gitlab-ctl reconfigure
+gitlab-ctl restart
+gitlab-rake gitlab:check SANITIZE=true
+gitlab-rake gitlab:doctor:secrets
