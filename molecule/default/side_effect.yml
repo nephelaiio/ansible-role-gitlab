@@ -1,0 +1,85 @@
+---
+- name: backup and restore
+
+  hosts: all
+
+  become: yes
+
+  tasks:
+
+    - name: verify frontpage redirect
+      uri:
+        url: http://localhost
+        follow_redirects: none
+        status_code: 302
+      register: _frontpage_redirect
+      until: _frontpage_redirect is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify frontpage content
+      uri:
+        url: http://localhost
+        status_code: 200
+      register: _frontpage_content
+      until: _frontpage_content is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify status command before backup
+      command: gitlab-ctl status
+
+    - name: take gitlab backup
+      command: /usr/local/bin/gitlab-backup
+
+    - name: disable connections to gitlab database
+      command: "gitlab-psql -d postgres -c \"update pg_database set datallowconn = false where datname = 'gitlabhq_production'\""
+
+    - name: disconnect users from gitlab database
+      command: "gitlab-psql -d postgres -c \"select pg_terminate_backend(pid) from pg_stat_activity where datname='gitlabhq_production'\""
+
+    - name: drop gitlab database
+      command: gitlab-psql -d postgres -c "DROP DATABASE gitlabhq_production;"
+
+    - name: delete gitlab configuration files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/gitlab/gitlab.rb
+        - /etc/gitlab/gitlab-secrets.json
+
+    - name: verify gitlab database removal
+      command: "gitlab-psql -d postgres -t -c \"select json_agg(datname) from pg_database\""
+      register: gitlab_remove_query
+      failed_when: "'gitlabhq_production' in (gitlab_remove_query.stdout | from_json)"
+
+    - name: perform gitlab restore
+      command: /usr/local/bin/gitlab-restore
+
+    - name: verify gitlab database restore
+      command: "gitlab-psql -d postgres -t -c \"select json_agg(datname) from pg_database\""
+      register: gitlab_verify_query
+      failed_when: "'gitlabhq_production' not in (gitlab_verify_query.stdout | from_json)"
+
+    - name: verify status command after restore
+      command: gitlab-ctl status
+
+    - name: verify frontpage redirect
+      uri:
+        url: http://localhost
+        follow_redirects: none
+        status_code: 302
+      register: _frontpage_redirect
+      until: _frontpage_redirect is not failed
+      retries: 12
+      delay: 15
+
+    - name: verify frontpage content
+      uri:
+        url: http://localhost
+        status_code: 200
+      register: _frontpage_content
+      until: _frontpage_content is not failed
+      retries: 12
+      delay: 15
