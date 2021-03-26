@@ -83,3 +83,4 @@ gitlab_email_display_name: "Gitlab"
 gitlab_email_reply_to: "gitlab@example.com"
 
 gitlab_config_extra: ''
+gitlab_backup_script_config_extra: ''
