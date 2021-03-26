@@ -2,6 +2,12 @@
 
 #{{ ansible_managed}}
 
+# get git user and group id
+unset -v git_user_id
+unset -v git_group_id
+git_user_id=$(id {{ gitlab_git_user }} -u)
+git_group_id=$(id {{ gitlab_git_group }} -g)
+
 # find latest data backup file
 unset -v latest_data
 for file in $(find {{ gitlab_backup_path }} -type f -name "*gitlab_backup.tar")
@@ -17,17 +23,18 @@ do
 done
 
 # stop services
-gitlab-ctl stop unicorn
 gitlab-ctl stop puma
 gitlab-ctl stop sidekiq
+gitlab-ctl stop unicorn
+gitlab-ctl reconfigure
+
+# restore application backup
+chown $git_user_id:$git_group_id $latest_data
+latest_prefix=$(echo $latest_data | sed 's/_gitlab_backup.tar//')
+force=yes /opt/gitlab/bin/gitlab-backup restore BACKUP=$latest_prefix
 
 # restore file backup
 tar xvzf $latest_config -C /
-
-# restore application backup
-latest_prefix=$(echo $latest_data | sed 's/_gitlab_backup.tar//')
-gitlab-ctl reconfigure
-force=yes gitlab-rake gitlab:backup:restore RAILS_ENV=production BACKUP=$latest_prefix
 
 # start services
 gitlab-ctl reconfigure

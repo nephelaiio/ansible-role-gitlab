@@ -42,6 +42,8 @@ gitlab_user: root
 gitlab_group: root
 gitlab_www_user: gitlab-www
 gitlab_www_group: gitlab-www
+gitlab_git_user: git
+gitlab_git_group: git
 gitlab_listen_https: "false"
 
 # LDAP Configuration.

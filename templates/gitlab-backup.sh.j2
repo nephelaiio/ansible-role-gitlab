@@ -3,7 +3,7 @@
 #{{ ansible_managed }}
 
 # backup application data
-gitlab-rake gitlab:backup:create
+/opt/gitlab/bin/gitlab-backup
 
 # find latest data backup file
 unset -v latest_data
