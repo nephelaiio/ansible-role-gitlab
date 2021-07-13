@@ -3,7 +3,7 @@
 #{{ ansible_managed }}
 
 # backup application data
-gitlab-rake gitlab:backup:create
+/opt/gitlab/bin/gitlab-backup
 
 # find latest data backup file
 unset -v latest_data
@@ -18,5 +18,3 @@ latest_config=$(echo $latest_data | sed 's/gitlab_backup.tar/gitlab_config.tgz/'
 tar cvzf $latest_config {{ gitlab_backup_source }}
 
 find {{ gitlab_backup_path }} -name "*gitlab_config.tgz" -mtime +30 -delete
-
-{{ gitlab_backup_script_config_extra }}
