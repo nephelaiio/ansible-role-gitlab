@@ -35,7 +35,7 @@ force=yes /opt/gitlab/bin/gitlab-backup restore BACKUP=$latest_prefix
 
 # restore file backup
 tar xvzf $latest_config -C /
-{% for id in gitlab_users %}
+{% for id in {{ gitlab_users }} %}
 if [[ -f "/etc/gitlab/{{ id }}-uid" ]]; then
   unset -v user_id
   unset -v group_id
