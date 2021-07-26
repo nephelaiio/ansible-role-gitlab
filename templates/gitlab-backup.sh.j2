@@ -2,6 +2,13 @@
 
 #{{ ansible_managed }}
 
+# get git user and group id
+{% for id in gitlab_users %}
+id {{ id }} -u > /etc/gitlab/{{ id }}-uid
+id {{ id }} -g > /etc/gitlab/{{ id }}-gid
+{% endfor %}
+
+
 # backup application data
 /opt/gitlab/bin/gitlab-backup
 
