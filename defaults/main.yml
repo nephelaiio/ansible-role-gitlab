@@ -34,7 +34,7 @@ gitlab_root_dir: "var/opt/gitlab"
 gitlab_git_data_dir: "/var/opt/gitlab/git-data"
 gitlab_manage_backup_path: "true"
 gitlab_backup_path: "/var/opt/gitlab/backups"
-gitlab_users:
+gitlab_default_users:
   - git
   - gitlab
   - gitlab-www
