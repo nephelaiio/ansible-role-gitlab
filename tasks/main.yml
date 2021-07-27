@@ -128,7 +128,9 @@
       cron:
         name: gitlab-backup-create
         job: "{{ gitlab_backup_bin }}"
-        special_time: hourly
+        hour: "*/3"
+        minute: "0"
+
       tags:
         - backup
         - restore
