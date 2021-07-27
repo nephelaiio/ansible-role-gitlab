@@ -6,7 +6,7 @@
 declare -a gitlab_users=({{ gitlab_default_users }})
 
 for id in ${gitlab_users[@]}; do
-  if id $id 2>&1 /dev/null; then
+  if id $id 2>&1 > /dev/null; then
     id $id -u | tee /etc/gitlab/$id-uid
     id $id -g | tee /etc/gitlab/$id-gid
   fi
