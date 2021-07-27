@@ -34,14 +34,9 @@ gitlab_root_dir: "/var/opt/gitlab"
 gitlab_git_data_dir: "{{ gitlab_root_dir }}/git-data"
 gitlab_manage_backup_path: "true"
 gitlab_backup_path: "{{ gitlab_root_dir }}/backups"
-gitlab_default_users:
-  - git
-  - gitlab-www
-  - gitlab-redis
-  - gitlab-psql
-  - gitlab-prometheus
-  - registry
-  - mattermost
+gitlab_default_users: |
+  "git" "gitlab-www" "gitlab-redis" "gitlab-psql"
+  "gitlab-prometheus" "registry" "mattermost"
 gitlab_backup_source: "/etc/gitlab/gitlab.rb /etc/gitlab/gitlab-secrets.json /etc/ssh /etc/gitlab/*-uid /etc/gitlab/*-gid"
 gitlab_backup_template: gitlab-backup.sh.j2
 gitlab_restore_template: gitlab-restore.sh.j2
