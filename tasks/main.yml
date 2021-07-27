@@ -109,6 +109,9 @@
         owner: root
         group: root
         mode: 0750
+      tags:
+        - backup
+        - restore
 
     - name: create gitlab restore script
       template:
@@ -117,12 +120,20 @@
         owner: root
         group: root
         mode: 0750
+      tags:
+        - backup
+        - restore
 
     - name: manage gitlab backup cronjob
       cron:
         name: gitlab-backup-create
         job: "{{ gitlab_backup_bin }}"
-        special_time: hourly
+        hour: "{{ gitlab_cron_hour_setting }}"
+        minute: "{{ gitlab_cron_minute_setting }}"
+
+      tags:
+        - backup
+        - restore
 
     - name: create gitlab backup motd pointers for debian
       copy:
@@ -135,6 +146,9 @@
           echo
         mode: 0755
       when: ansible_os_family | lower == 'debian'
+      tags:
+        - backup
+        - restore
 
     - name: create gitlab backup motd pointers for redhat
       copy:
@@ -147,5 +161,8 @@
           echo
         mode: 0755
       when: ansible_os_family | lower == 'redhat'
+      tags:
+        - backup
+        - restore
 
   when: gitlab_backup | default(True)

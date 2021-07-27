@@ -30,18 +30,26 @@ gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
 gitlab_conf_path: /etc/gitlab/gitlab.rb
 gitlab_external_url: "http://gitlab/"
-gitlab_git_data_dir: "/var/opt/gitlab/git-data"
+gitlab_root_dir: "/var/opt/gitlab"
+gitlab_git_data_dir: "{{ gitlab_root_dir }}/git-data"
 gitlab_manage_backup_path: "true"
-gitlab_backup_path: "/var/opt/gitlab/backups"
-gitlab_backup_source: "/etc/gitlab/gitlab.rb /etc/gitlab/gitlab-secrets.json /etc/ssh"
+gitlab_backup_path: "{{ gitlab_root_dir }}/backups"
+gitlab_default_users: |
+  "git" "gitlab-www" "gitlab-redis" "gitlab-psql"
+  "gitlab-prometheus" "registry" "mattermost"
+gitlab_backup_source: "/etc/gitlab/gitlab.rb /etc/gitlab/gitlab-secrets.json /etc/ssh /etc/gitlab/*-uid /etc/gitlab/*-gid"
 gitlab_backup_template: gitlab-backup.sh.j2
 gitlab_restore_template: gitlab-restore.sh.j2
 gitlab_backup_bin: /usr/local/bin/gitlab-backup
 gitlab_restore_bin: /usr/local/bin/gitlab-restore
+gitlab_cron_hour_setting: "*/3"
+gitlab_cron_minute_setting: "0"
 gitlab_user: root
 gitlab_group: root
 gitlab_www_user: gitlab-www
 gitlab_www_group: gitlab-www
+gitlab_git_user: git
+gitlab_git_group: git
 gitlab_listen_https: "false"
 
 # LDAP Configuration.
