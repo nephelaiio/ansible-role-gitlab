@@ -6,8 +6,10 @@
 declare -a gitlab_users=({{ gitlab_default_users }})
 
 for id in ${gitlab_users[@]}; do
-  id $id -u | tee /etc/gitlab/$id-uid
-  id $id -g | tee /etc/gitlab/$id-gid
+  if id $id 2>&1 /dev/null; then
+    id $id -u | tee /etc/gitlab/$id-uid
+    id $id -g | tee /etc/gitlab/$id-gid
+  fi
 done
 
 # backup application data
