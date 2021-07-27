@@ -128,8 +128,8 @@
       cron:
         name: gitlab-backup-create
         job: "{{ gitlab_backup_bin }}"
-        hour: "*/3"
-        minute: "0"
+        hour: "{{ gitlab_cron_hour_setting }}"
+        minute: "{{ gitlab_cron_minute_setting }}"
 
       tags:
         - backup

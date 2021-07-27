@@ -42,6 +42,8 @@ gitlab_backup_template: gitlab-backup.sh.j2
 gitlab_restore_template: gitlab-restore.sh.j2
 gitlab_backup_bin: /usr/local/bin/gitlab-backup
 gitlab_restore_bin: /usr/local/bin/gitlab-restore
+gitlab_cron_hour_setting: "*/3"
+gitlab_cron_minute_setting: "0"
 gitlab_user: root
 gitlab_group: root
 gitlab_www_user: gitlab-www
