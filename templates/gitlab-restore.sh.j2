@@ -43,9 +43,9 @@ for id in ${gitlab_users[@]}; do
     user_id=$(id $id -u)
     group_id=$(id $id -g)
     find {{ gitlab_root_dir }} -group $(cat /etc/gitlab/$id-gid) \
-    | xarg -0 -I {} chgrp $group_id {}
+    | xargs -0 -I {} chgrp $group_id {}
     find {{ gitlab_root_dir }} -user $(cat /etc/gitlab/$id-uid) \
-    | xarg -0 -I {} chown $user_id {}
+    | xargs -0 -I {} chown $user_id {}
   fi
 done
 
