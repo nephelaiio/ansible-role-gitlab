@@ -72,6 +72,23 @@ gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }
 gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
 gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 
+# Gitlab user definitions
+
+user['uid'] = {{ gitlab_user_id }}
+user['gid'] = {{ gitlab_user_id }}
+postgresql['uid'] = {{ gitlab_postgresql_id }}
+postgresql['gid'] = {{ gitlab_postgresql_id }}
+redis['uid'] = {{ gitlab_redis_id }}
+redis['gid'] = {{ gitlab_redis_id }}
+web_server['uid'] = {{ gitlab_web_server_id }}
+web_server['gid'] = {{ gitlab_web_server_id }}
+registry['uid'] = {{ gitlab_registry_id }}
+registry['gid'] = {{ gitlab_registry_id }}
+mattermost['uid'] = {{ gitlab_mattermost_id }}
+mattermost['gid'] = {{ gitlab_mattermost_id }}
+prometheus['uid'] = {{ gitlab_prometheus_id }}
+prometheus['gid'] = {{ gitlab_prometheus_id }}
+
 # SSH
 {% if gitlab_ssh_listen_port is defined %}
 gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_listen_port }}
