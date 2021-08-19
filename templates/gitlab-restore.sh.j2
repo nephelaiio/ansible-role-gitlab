@@ -2,13 +2,6 @@
 
 #{{ ansible_managed}}
 
-# get git user and group id
-unset -v git_user_id
-unset -v git_group_id
-declare -a gitlab_users=({{ gitlab_default_users }})
-git_user_id=$(id {{ gitlab_git_user }} -u)
-git_group_id=$(id {{ gitlab_git_group }} -g)
-
 # find latest data backup file
 unset -v latest_data
 for file in $(find {{ gitlab_backup_path }} -type f -name "*gitlab_backup.tar")
@@ -30,24 +23,11 @@ gitlab-ctl stop unicorn
 gitlab-ctl reconfigure
 
 # restore application backup
-chown $git_user_id:$git_group_id $latest_data
 latest_prefix=$(echo $latest_data | sed 's/_gitlab_backup.tar//')
 force=yes /opt/gitlab/bin/gitlab-backup restore BACKUP=$latest_prefix
 
 # restore file backup
 tar xvzf $latest_config -C /
-for id in ${gitlab_users[@]}; do
-  if [[ -f "/etc/gitlab/$id-uid" ]]; then
-    unset -v user_id
-    unset -v group_id
-    user_id=$(id $id -u)
-    group_id=$(id $id -g)
-    find {{ gitlab_root_dir }} -group $(cat /etc/gitlab/$id-gid) \
-    | xargs -0 -I {} chgrp $group_id {}
-    find {{ gitlab_root_dir }} -user $(cat /etc/gitlab/$id-uid) \
-    | xargs -0 -I {} chown $user_id {}
-  fi
-done
 
 # start services
 gitlab-ctl reconfigure

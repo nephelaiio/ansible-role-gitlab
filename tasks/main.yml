@@ -79,12 +79,6 @@
 - name: flush handlers
   meta: flush_handlers
 
-- name: reconfigure gitlab (first run)
-  command: gitlab-ctl reconfigure
-  args:
-    creates: /var/opt/gitlab/bootstrapped
-  when: not gitlab_file.stat.exists
-
 - name: manage gitlab configuration
   template:
     src: "{{ gitlab_conf_template }}"
@@ -93,6 +87,12 @@
     group: "{{ gitlab_group }}"
     mode: 0600
   notify: reconfigure gitlab
+
+- name: reconfigure gitlab (first run)
+  command: gitlab-ctl reconfigure
+  args:
+    creates: /var/opt/gitlab/bootstrapped
+  when: not gitlab_file.stat.exists
 
 - name: remove temporary directories
   file:
