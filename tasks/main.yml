@@ -1,142 +1,208 @@
 ---
-- name: set variable overrides
-  set_fact:
-    _gitlab_requirements: "{{ gitlab_requirements | default(gitlab_requirements_default | sorted_get(overrides)) }}"
-  vars:
-    overrides:
-      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}"
-      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
-      - "{{ ansible_distribution | lower }}"
-      - "{{ ansible_os_family | lower }}"
-      - "default"
-  tags:
-    - always
+- name: Set gitlab default facts
+  tags: always
+  block:
+    - name: Set variable overrides
+      ansible.builtin.set_fact:
+        _gitlab_requirements: "{{ gitlab_requirements | default(_gitlab_requirements_default) }}"
+      vars:
+        _gitlab_requirements_default: "{{ gitlab_requirements_default | nephelaiio.plugins.sorted_get(overrides) }}"
+        overrides:
+          - "{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}"
+          - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
+          - "{{ ansible_distribution | lower }}"
+          - "{{ ansible_os_family | lower }}"
+          - "default"
 
-- name: load installation script url
-  set_fact:
-    gitlab_repository_installation_script_url: "{{ gitlab_repository_installation_script_url_default[ansible_os_family | lower] }}"
-  when: gitlab_repository_installation_script_url is not defined
+    - name: Load installation script url
+      ansible.builtin.set_fact:
+        gitlab_repository_installation_script_url: "{{ _gitlab_script_url_default }}"
+        _gitlab_package: "{{ _package }}"
+      vars:
+        _package: "{{ (gitlab_package is search('=') | bool) | ternary(_package_split, gitlab_package) }}"
+        _package_split: "{{ gitlab_package.split('=') | first }}"
+        _gitlab_script_url_default: "{{ _default[ansible_os_family | lower] }}"
+        _default: "{{ gitlab_repository_installation_script_url_default }}"
+      when: gitlab_repository_installation_script_url | default('') == ''
 
-- name: check existing configuration
-  stat:
-    path: /etc/gitlab/gitlab.rb
-  register: gitlab_config_file
-
-- name: check existing installation
-  stat:
-    path: /usr/bin/gitlab-ctl
-  register: gitlab_file
-
-- name: install gitlab dependencies
-  package:
+- name: Install gitlab dependencies
+  ansible.builtin.package:
     name: "{{ _gitlab_requirements }}"
     state: "{{ gitlab_package_state }}"
 
-- name: create temporary target directory
-  tempfile:
-    state: directory
-    prefix: gitlab
-  register: tmpdir
-  changed_when: false
+- name: Manage gitlab server installation tasks
+  block:
+    - name: Query installed packages
+      ansible.builtin.package_facts:
+        manager: auto
 
-- name: register installation script location
-  set_fact:
-    install_script: "{{ tmpdir.path }}/gitlab_install_repository.sh"
+    - name: Manage gitlab package queries for debian
+      when: ansible_os_family == "Debian"
+      block:
+        - name: Query available gitlab server package for debian
+          ansible.builtin.shell:
+            cmd: "apt-cache madison {{ _gitlab_package }} | awk '{ print $3 }' | sort -r | head -1"
+          changed_when: false
+          register: gitlab_package_query
+          tags: skip_ansible_lint
 
-- name: download gitlab repository installation script
-  get_url:
-    url: "{{ gitlab_repository_installation_script_url }}"
-    dest: "{{ install_script }}"
-    validate_certs: "{{ gitlab_download_validate_certs }}"
-    mode: 755
-  when: not gitlab_file.stat.exists
+        - name: Set target gitlab package version fact
+          ansible.builtin.set_fact:
+            gitlab_package_version_target: "{{ _version }}"
+          vars:
+            _available: "{{ gitlab_package_query.stdout.split('.') | first }}"
+            _version_split: "{{ gitlab_package.split('=') | last }}"
+            _target_version: "{{ _version_split.split('.') | first }}"
+            _version: "{{ (gitlab_package is search('=') | bool) | ternary(_target_version, _available) }}"
 
-- name: install gitlab repository
-  command: "{{ install_script }}"
-  when: not gitlab_file.stat.exists
+    - name: Manage gitlab package queries for redhat
+      when: ansible_os_family == "RedHat"
+      block:
+        - name: Query available gitlab server package for redhat
+          ansible.builtin.shell:
+            cmd: "yum --showduplicates list {{ _gitlab_package }}"
+          changed_when: false
+          register: gitlab_package_query
+          tags: skip_ansible_lint
 
-- block:
+        - name: Set target gitlab package version fact
+          ansible.builtin.set_fact:
+            gitlab_package_version_target: "{{ _version }}"
+          vars:
+            _available: "{{ gitlab_package_query.stdout.split('.') | first }}"
+            _version_split: "{{ gitlab_package.split('=') | last }}"
+            _target_version: "{{ _version_split.split('.') | first }}"
+            _version: "{{ (gitlab_package is search('=') | bool) | ternary(_target_version, _available) }}"
 
-    - name: import apt gpg key
-      apt_key:
-        url: https://packages.gitlab.com/gpg.key
+    - name: Set target gitlab package install status
+      ansible.builtin.set_fact:
+        gitlab_server_installed: "{{ _gitlab_package in packages }}"
 
-    - name: update apt package cache
-      apt:
-        update_cache: true
-
-    - name: update ca certificates
-      command: update-ca-certificates
+    - name: Create temporary target directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: gitlab
+      register: tmpdir
       changed_when: false
 
-  when: ansible_os_family | lower == 'debian'
+    - name: Register installation script location
+      ansible.builtin.set_fact:
+        install_script: "{{ tmpdir.path }}/gitlab_install_repository.sh"
 
-- name: install gitlab
-  package:
-    name: "{{ gitlab_package | default(gitlab_package_default) }}"
-  notify: restart gitlab-runsvdir service
+    - name: Manage gitlab repository tasks
+      when: not gitlab_server_installed | bool
+      block:
+        - name: Download gitlab repository installation script
+          ansible.builtin.get_url:
+            url: "{{ gitlab_repository_installation_script_url }}"
+            dest: "{{ install_script }}"
+            validate_certs: "{{ gitlab_download_validate_certs }}"
+            mode: "0755"
 
-- name: flush handlers
-  meta: flush_handlers
+        - name: Install gitlab repository
+          ansible.builtin.command: "{{ install_script }}"
+          tags: skip_ansible_lint
 
-- name: manage gitlab configuration
-  template:
-    src: "{{ gitlab_conf_template }}"
-    dest: "{{ gitlab_conf_path }}"
-    owner: "{{ gitlab_user }}"
-    group: "{{ gitlab_group }}"
-    mode: 0600
-  notify: reconfigure gitlab
+        - name: Update apt cache
+          ansible.builtin.apt:
+            update_cache: true
+          changed_when: false
+          when: ansible_os_family | lower == 'debian'
 
-- name: reconfigure gitlab (first run)
-  command: gitlab-ctl reconfigure
-  args:
-    creates: /var/opt/gitlab/bootstrapped
-  when: not gitlab_file.stat.exists
+        - name: Update dnf cache
+          ansible.builtin.dnf:
+            update_only: true
+          when: ansible_os_family | lower == 'redhat'
+          changed_when: false
 
-- name: remove temporary directories
-  file:
-    path: "{{ tmpdir.path }}"
-    state: absent
-  changed_when: false
+    - name: Manage gitlab import keys for Debian
+      when: ansible_os_family | lower == 'debian'
+      block:
+        - name: Import apt gpg key
+          ansible.builtin.apt_key:
+            url: https://packages.gitlab.com/gpg.key
 
-- block:
+        - name: Update ca certificates
+          ansible.builtin.command: update-ca-certificates
+          changed_when: false
 
-    - name: create gitlab backup script
-      template:
+    - name: Manage gitlab configure for existing installations
+      when:
+        - gitlab_server_installed | bool
+        - gitlab_package_version_target is version('18', '>=')
+      block:
+        - name: Manage gitlab configuration
+          ansible.builtin.template:
+            src: "{{ gitlab_conf_template }}"
+            dest: "{{ gitlab_conf_path }}"
+            owner: "{{ gitlab_user }}"
+            group: "{{ gitlab_group }}"
+            mode: "0600"
+          notify: Reconfigure gitlab
+
+        - name: Flush handlers
+          ansible.builtin.meta: flush_handlers
+
+    - name: Install gitlab
+      ansible.builtin.package:
+        name: "{{ gitlab_package | default(gitlab_package_default) }}"
+      notify: Restart gitlab-runsvdir service
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Manage gitlab configuration
+      ansible.builtin.template:
+        src: "{{ gitlab_conf_template }}"
+        dest: "{{ gitlab_conf_path }}"
+        owner: "{{ gitlab_user }}"
+        group: "{{ gitlab_group }}"
+        mode: "0600"
+      notify: Reconfigure gitlab
+
+    - name: Reconfigure gitlab (first run)
+      ansible.builtin.command: gitlab-ctl reconfigure
+      when: not gitlab_server_installed | bool
+      tags: skip_ansible_lint
+
+  always:
+    - name: Remove temporary directories
+      ansible.builtin.file:
+        path: "{{ tmpdir.path }}"
+        state: absent
+      changed_when: false
+
+- name: Manage gitlab backup script tasks
+  when: gitlab_backup | default('true') | bool
+  tags:
+    - backup
+    - restore
+  block:
+    - name: Create gitlab backup script
+      ansible.builtin.template:
         src: "{{ gitlab_backup_template }}"
         dest: "{{ gitlab_backup_bin }}"
         owner: root
         group: root
-        mode: 0750
-      tags:
-        - backup
-        - restore
+        mode: "0750"
 
-    - name: create gitlab restore script
-      template:
+    - name: Create gitlab restore script
+      ansible.builtin.template:
         src: "{{ gitlab_restore_template }}"
         dest: "{{ gitlab_restore_bin }}"
         owner: root
         group: root
-        mode: 0750
-      tags:
-        - backup
-        - restore
+        mode: "0750"
 
-    - name: manage gitlab backup cronjob
-      cron:
+    - name: Manage gitlab backup cronjob
+      ansible.builtin.cron:
         name: gitlab-backup-create
         job: "{{ gitlab_backup_bin }}"
         hour: "{{ gitlab_cron_hour_setting }}"
         minute: "{{ gitlab_cron_minute_setting }}"
 
-      tags:
-        - backup
-        - restore
-
-    - name: create gitlab backup motd pointers for debian
-      copy:
+    - name: Create gitlab backup motd pointers for debian
+      ansible.builtin.copy:
         dest: /etc/update-motd.d/99-gitlab
         content: |
           #!/usr/bin/env bash
@@ -144,14 +210,11 @@
           echo run gitlab-backup to manually force gitlab backup creation
           echo run gitlab-restore to manually restore latest gitlab backup
           echo
-        mode: 0755
+        mode: "0755"
       when: ansible_os_family | lower == 'debian'
-      tags:
-        - backup
-        - restore
 
-    - name: create gitlab backup motd pointers for redhat
-      copy:
+    - name: Create gitlab backup motd pointers for redhat
+      ansible.builtin.copy:
         dest: /etc/profile.d/99-gitlab
         content: |
           #!/usr/bin/env bash
@@ -159,10 +222,5 @@
           echo run gitlab-backup to manually force gitlab backup creation
           echo run gitlab-restore to manually restore latest gitlab backup
           echo
-        mode: 0755
+        mode: "0755"
       when: ansible_os_family | lower == 'redhat'
-      tags:
-        - backup
-        - restore
-
-  when: gitlab_backup | default(True)

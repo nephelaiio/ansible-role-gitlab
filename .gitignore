@@ -5,3 +5,5 @@ __pycache__/
 Gemfile.lock
 **/.ropeproject
 playbook.retry
+.DS_Store
+.ansible/

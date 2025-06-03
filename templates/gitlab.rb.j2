@@ -31,7 +31,18 @@ gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 nginx['redirect_http_to_https'] = false
 
 # The directory where Git repositories will be stored.
+{% if (gitlab_package_version_target | int) >= 18 %}
+gitaly['configuration'] = {
+  storage: [
+    {
+      name: 'default',
+      path: '{{ gitlab_git_data_dir }}/repositories',
+    },
+  ],
+}
+{% else %}
 git_data_dirs({ "default" => { "path" => "{{ gitlab_git_data_dir }}" } })
+{% endif %}
 
 # Backup settings
 gitlab_rails['manage_backup_path'] = {{ gitlab_manage_backup_path | default('true') }}

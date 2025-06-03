@@ -1,14 +1,10 @@
 ---
-- name: backup and restore
-
+- name: Backup and restore
   hosts: all
-
-  become: yes
-
+  become: true
   tasks:
-
-    - name: verify frontpage redirect
-      uri:
+    - name: Verify frontpage redirect
+      ansible.builtin.uri:
         url: http://localhost
         follow_redirects: none
         status_code: 302
@@ -17,8 +13,8 @@
       retries: 12
       delay: 15
 
-    - name: verify frontpage content
-      uri:
+    - name: Verify frontpage content
+      ansible.builtin.uri:
         url: http://localhost
         status_code: 200
       register: _frontpage_content
@@ -26,47 +22,47 @@
       retries: 12
       delay: 15
 
-    - name: verify status command before backup
-      command: gitlab-ctl status
+    - name: Verify status command before backup
+      ansible.builtin.command: gitlab-ctl status
 
-    - name: take gitlab backup
-      command: /usr/local/bin/gitlab-backup
+    - name: Take gitlab backup
+      ansible.builtin.command: /usr/local/bin/gitlab-backup
 
-    - name: disable connections to gitlab database
-      command: "gitlab-psql -d postgres -c \"update pg_database set datallowconn = false where datname = 'gitlabhq_production'\""
+    - name: Disable connections to gitlab database
+      ansible.builtin.command: 'gitlab-psql -d postgres -c "update pg_database set datallowconn = false where datname = ''gitlabhq_production''"'
 
-    - name: disconnect users from gitlab database
-      command: "gitlab-psql -d postgres -c \"select pg_terminate_backend(pid) from pg_stat_activity where datname='gitlabhq_production'\""
+    - name: Disconnect users from gitlab database
+      ansible.builtin.command: 'gitlab-psql -d postgres -c "select pg_terminate_backend(pid) from pg_stat_activity where datname=''gitlabhq_production''"'
 
-    - name: drop gitlab database
-      command: gitlab-psql -d postgres -c "DROP DATABASE gitlabhq_production;"
+    - name: Drop gitlab database
+      ansible.builtin.command: gitlab-psql -d postgres -c "DROP DATABASE gitlabhq_production;"
 
-    - name: delete gitlab configuration files
-      file:
+    - name: Delete gitlab configuration files
+      ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       loop:
         - /etc/gitlab/gitlab.rb
         - /etc/gitlab/gitlab-secrets.json
 
-    - name: verify gitlab database removal
-      command: "gitlab-psql -d postgres -t -c \"select json_agg(datname) from pg_database\""
+    - name: Verify gitlab database removal
+      ansible.builtin.command: 'gitlab-psql -d postgres -t -c "select json_agg(datname) from pg_database"'
       register: gitlab_remove_query
       failed_when: "'gitlabhq_production' in (gitlab_remove_query.stdout | from_json)"
 
-    - name: perform gitlab restore
-      command: /usr/local/bin/gitlab-restore
+    - name: Perform gitlab restore
+      ansible.builtin.command: /usr/local/bin/gitlab-restore
 
-    - name: verify gitlab database restore
-      command: "gitlab-psql -d postgres -t -c \"select json_agg(datname) from pg_database\""
+    - name: Verify gitlab database restore
+      ansible.builtin.command: 'gitlab-psql -d postgres -t -c "select json_agg(datname) from pg_database"'
       register: gitlab_verify_query
       failed_when: "'gitlabhq_production' not in (gitlab_verify_query.stdout | from_json)"
 
-    - name: verify status command after restore
-      command: gitlab-ctl status
+    - name: Verify status command after restore
+      ansible.builtin.command: gitlab-ctl status
 
-    - name: verify frontpage redirect
-      uri:
+    - name: Verify frontpage redirect
+      ansible.builtin.uri:
         url: http://localhost
         follow_redirects: none
         status_code: 302
@@ -75,8 +71,8 @@
       retries: 12
       delay: 15
 
-    - name: verify frontpage content
-      uri:
+    - name: Verify frontpage content
+      ansible.builtin.uri:
         url: http://localhost
         status_code: 200
       register: _frontpage_content

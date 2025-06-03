@@ -1,0 +1,47 @@
+---
+name: molecule
+
+env:
+  DEVBOX_VERSION: ${{ vars.DEVBOX_VERSION }}
+
+on:
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: "0 5 * * 5"
+
+defaults:
+  run:
+    working-directory: "nephelaiio.gitlab"
+
+jobs:
+  molecule:
+    name: molecule
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - ubuntu2004
+          - ubuntu2204
+          - debian11
+          - debian12
+          - rockylinux9
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v4
+        with:
+          path: "nephelaiio.gitlab"
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.12.0
+        with:
+          project-path: "nephelaiio.gitlab"
+          devbox-version: ${{ vars.DEVBOX_VERSION }}
+
+      - name: Run Molecule tests.
+        run: devbox run make test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DOCKER_IMAGE: ${{ matrix.image }}
