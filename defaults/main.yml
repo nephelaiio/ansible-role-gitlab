@@ -25,7 +25,7 @@ gitlab_requirements_default:
     - tzdata
     - cronie
     - rsync
-gitlab_package: "{{ gitlab_edition }}=17.11.3-ce.0"
+gitlab_package: "{{ gitlab_edition }}"
 gitlab_package_state: present
 gitlab_conf_template: gitlab.rb.j2
 gitlab_conf_path: /etc/gitlab/gitlab.rb
