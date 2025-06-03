@@ -36,44 +36,6 @@
       ansible.builtin.package_facts:
         manager: auto
 
-    - name: Manage gitlab package queries for debian
-      when: ansible_os_family == "Debian"
-      block:
-        - name: Query available gitlab server package for debian
-          ansible.builtin.shell:
-            cmd: "apt-cache madison {{ _gitlab_package }} | awk '{ print $3 }' | sort -r | head -1"
-          changed_when: false
-          register: gitlab_package_query
-          tags: skip_ansible_lint
-
-        - name: Set target gitlab package version fact
-          ansible.builtin.set_fact:
-            gitlab_package_version_target: "{{ _version }}"
-          vars:
-            _available: "{{ gitlab_package_query.stdout.split('.') | first }}"
-            _version_split: "{{ gitlab_package.split('=') | last }}"
-            _target_version: "{{ _version_split.split('.') | first }}"
-            _version: "{{ (gitlab_package is search('=') | bool) | ternary(_target_version, _available) }}"
-
-    - name: Manage gitlab package queries for redhat
-      when: ansible_os_family == "RedHat"
-      block:
-        - name: Query available gitlab server package for redhat
-          ansible.builtin.shell:
-            cmd: "yum --showduplicates list {{ _gitlab_package }}"
-          changed_when: false
-          register: gitlab_package_query
-          tags: skip_ansible_lint
-
-        - name: Set target gitlab package version fact
-          ansible.builtin.set_fact:
-            gitlab_package_version_target: "{{ _version }}"
-          vars:
-            _available: "{{ gitlab_package_query.stdout.split('.') | first }}"
-            _version_split: "{{ gitlab_package.split('=') | last }}"
-            _target_version: "{{ _version_split.split('.') | first }}"
-            _version: "{{ (gitlab_package is search('=') | bool) | ternary(_target_version, _available) }}"
-
     - name: Set target gitlab package install status
       ansible.builtin.set_fact:
         gitlab_server_installed: "{{ _gitlab_package in packages }}"
@@ -114,6 +76,44 @@
             update_only: true
           when: ansible_os_family | lower == 'redhat'
           changed_when: false
+
+    - name: Manage gitlab package queries for debian
+      when: ansible_os_family == "Debian"
+      block:
+        - name: Query available gitlab server package for debian
+          ansible.builtin.shell:
+            cmd: "apt-cache madison {{ _gitlab_package }} | awk '{ print $3 }' | sort -r | head -1"
+          changed_when: false
+          register: gitlab_package_query
+          tags: skip_ansible_lint
+
+        - name: Set target gitlab package version fact
+          ansible.builtin.set_fact:
+            gitlab_package_version_target: "{{ _version }}"
+          vars:
+            _available: "{{ gitlab_package_query.stdout.split('.') | first }}"
+            _version_split: "{{ gitlab_package.split('=') | last }}"
+            _target_version: "{{ _version_split.split('.') | first }}"
+            _version: "{{ (gitlab_package is search('=') | bool) | ternary(_target_version, _available) }}"
+
+    - name: Manage gitlab package queries for redhat
+      when: ansible_os_family == "RedHat"
+      block:
+        - name: Query available gitlab server package for redhat
+          ansible.builtin.shell:
+            cmd: "yum --showduplicates list {{ _gitlab_package }}"
+          changed_when: false
+          register: gitlab_package_query
+          tags: skip_ansible_lint
+
+        - name: Set target gitlab package version fact
+          ansible.builtin.set_fact:
+            gitlab_package_version_target: "{{ _version }}"
+          vars:
+            _available: "{{ gitlab_package_query.stdout.split('.') | first }}"
+            _version_split: "{{ gitlab_package.split('=') | last }}"
+            _target_version: "{{ _version_split.split('.') | first }}"
+            _version: "{{ (gitlab_package is search('=') | bool) | ternary(_target_version, _available) }}"
 
     - name: Manage gitlab import keys for Debian
       when: ansible_os_family | lower == 'debian'
