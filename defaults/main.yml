@@ -19,7 +19,7 @@ gitlab_requirements_default:
   redhat:
     - openssh-server
     - postfix
-    - curl
+    - curl-minimal
     - openssl
     - ca-certificates
     - tzdata
