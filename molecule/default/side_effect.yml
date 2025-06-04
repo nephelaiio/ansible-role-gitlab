@@ -1,7 +1,6 @@
 ---
 - name: Backup and restore
   hosts: all
-  become: true
   tasks:
     - name: Verify frontpage redirect
       ansible.builtin.uri:
