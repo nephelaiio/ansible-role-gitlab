@@ -5,21 +5,17 @@ galaxy_info:
   author: nephelaiio
   description: An Ansible role to install and configure gitlab
   license: MIT
-  min_ansible_version: 2.2
+  min_ansible_version: "2.9"
   platforms:
-    - name: EL
-      versions:
-        - 7
     - name: Ubuntu
       versions:
         - focal
-        - bionic
+        - jammy
     - name: Debian
       versions:
-        - buster
+        - bookworm
 
   galaxy_tags:
     - git
 
-dependencies:
-  - role: nephelaiio.plugins
+dependencies: []

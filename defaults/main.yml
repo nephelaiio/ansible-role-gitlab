@@ -1,9 +1,9 @@
 ---
 # General config.
 gitlab_repository_installation_script_url_default:
-  debian: 'https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.deb.sh'
-  redhat: 'https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.rpm.sh'
-gitlab_edition: gitlab-ce  # gitlab-ce | gitlab-ee
+  debian: "https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.deb.sh"
+  redhat: "https://packages.gitlab.com/install/repositories/gitlab/{{ gitlab_edition }}/script.rpm.sh"
+gitlab_edition: gitlab-ce # gitlab-ce | gitlab-ee
 gitlab_requirements_default:
   debian:
     - openssh-server
@@ -19,7 +19,7 @@ gitlab_requirements_default:
   redhat:
     - openssh-server
     - postfix
-    - curl
+    - curl-minimal
     - openssl
     - ca-certificates
     - tzdata
@@ -94,4 +94,4 @@ gitlab_email_from: "gitlab@example.com"
 gitlab_email_display_name: "Gitlab"
 gitlab_email_reply_to: "gitlab@example.com"
 
-gitlab_config_extra: ''
+gitlab_config_extra: ""

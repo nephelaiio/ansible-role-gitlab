@@ -1,0 +1,6 @@
+---
+roles: []
+collections:
+  - name: nephelaiio.plugins
+  - name: community.general
+  - name: community.docker

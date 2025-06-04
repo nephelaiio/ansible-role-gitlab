@@ -1,23 +1,16 @@
 ---
-- name: destroy
-
+- name: Destroy
   hosts: localhost
-
   connection: local
-
   gather_facts: False
-
   no_log: "{{ not lookup('env', 'MOLECULE_DEBUG') | bool }}"
-
   vars:
     molecule_file: "{{ lookup('env', 'MOLECULE_FILE') }}"
     molecule_yml: "{{ lookup('file', molecule_file) | from_yaml }}"
-
   tasks:
-
-    - name: destroy molecule instances
-      docker_container:
+    - name: Destroy molecule instances
+      community.docker.docker_container:
         name: "{{ item.name }}"
         state: absent
         force_kill: "{{ item.force_kill | default(True) }}"
-      with_items: "{{ molecule_yml.platforms }}"
+      loop: "{{ molecule_yml.platforms }}"

@@ -1,23 +1,22 @@
 ---
-- name: converge
-
+- name: Converge
   hosts: all
-
   roles:
-
-    - role: nephelaiio.gitlab
-
+    - nephelaiio.gitlab
   pre_tasks:
-
-    - name: update apt cache
-      apt:
+    - name: Update apt cache
+      ansible.builtin.apt:
         update_cache: true
       when: ansible_os_family | lower == 'debian'
-      failed_when: false
-      ignore_errors: true
       changed_when: false
 
-    - name: remove dockerenv
-      file:
+    - name: Update yum cache
+      ansible.builtin.dnf:
+        update_only: true
+      when: ansible_os_family | lower == 'redhat'
+      changed_when: false
+
+    - name: Remove dockerenv
+      ansible.builtin.file:
         path: /.dockerenv
         state: absent
