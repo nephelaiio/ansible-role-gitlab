@@ -1,6 +1,6 @@
 # nephelaiio.gitlab
 
-[![Build Status](https://github.com/nephelaiio/ansible-role-gitlab/workflows/CI/badge.svg)](https://github.com/nephelaiio/ansible-role-gitlab/actions)
+[![Build Status](https://github.com/nephelaiio/ansible-role-gitlab/actions/workflows/molecule.yml/badge.svg)](https://github.com/nephelaiio/ansible-role-gitlab/actions/workflows/molecule.yml)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nephelaiio.gitlab.vim-blue.svg)](https://galaxy.ansible.com/nephelaiio/gitlab/)
 
 An [ansible role](https://galaxy.ansible.com/nephelaiio/gitlab) to install and configure gitlab
