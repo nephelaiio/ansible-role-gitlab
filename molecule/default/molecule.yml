@@ -17,12 +17,14 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     tmpfs:
       - /tmp
-      - /opt
 provisioner:
   name: ansible
   inventory:
     group_vars:
       all:
         gitlab_tempdir_path: /var/tmp
+  config_options:
+    defaults:
+      callbacks_enabled: ansible.posix.profile_tasks
 verifier:
   name: ansible

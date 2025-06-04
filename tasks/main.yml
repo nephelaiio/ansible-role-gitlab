@@ -103,7 +103,7 @@
         - name: Query available gitlab server package for redhat
           ansible.builtin.shell:
             cmd: |
-              yum --showduplicates list {{ _gitlab_package }} | awk '{ print $2 }' | sort -r | 
+              yum --showduplicates list {{ _gitlab_package }} | awk '{ print $2 }' | sort -r |
               grep -iv 'metadata\|packages' | head -1
           changed_when: false
           register: gitlab_package_query

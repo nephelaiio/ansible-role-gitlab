@@ -27,12 +27,14 @@ By default this role does not depend on any external roles. If any such dependen
 Please make sure your environment has [docker](https://www.docker.com) installed in order to run role validation tests. Additional python dependencies are listed in the [requirements file](/requirements.txt)
 
 Role is tested against the following distributions (docker images):
-  * Ubuntu Focal
-  * Ubuntu Bionic
-  * CentOS 7
-  * Debian Buster
 
-You can test the role directly from sources using command ` molecule test `
+- Ubuntu Focal
+- Ubuntu Jammy
+- Debian Bullseye
+- Debian Bookworm
+- Rockylinux 9
+
+You can test the role directly from sources using command `molecule test`
 
 ## License
 
