@@ -20,5 +20,9 @@ platforms:
       - /opt
 provisioner:
   name: ansible
+  inventory:
+    group_vars:
+      all:
+        gitlab_tempdir_path: /var/tmp
 verifier:
   name: ansible
