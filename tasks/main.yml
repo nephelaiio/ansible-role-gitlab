@@ -42,6 +42,7 @@
 
     - name: Create temporary target directory
       ansible.builtin.tempfile:
+        path: "/var/tmp"
         state: directory
         prefix: gitlab
       register: tmpdir
