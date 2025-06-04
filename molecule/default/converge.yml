@@ -1,7 +1,6 @@
 ---
 - name: Converge
   hosts: all
-  become: true
   roles:
     - nephelaiio.gitlab
   pre_tasks:
