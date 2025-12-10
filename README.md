@@ -31,7 +31,6 @@ Role is tested against the following distributions (docker images):
 - Ubuntu Noble
 - Ubuntu Jammy
 - Ubuntu Focal
-- Debian Trixie
 - Debian Bookworm
 - Debian Bullseye
 

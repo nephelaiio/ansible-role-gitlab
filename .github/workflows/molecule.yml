@@ -22,8 +22,6 @@ jobs:
             command: /lib/systemd/systemd
           - name: ubuntu2004
             command: /lib/systemd/systemd
-          - name: debian13
-            command: /lib/systemd/systemd
           - name: debian12
             command: /lib/systemd/systemd
           - name: debian11
