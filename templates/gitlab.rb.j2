@@ -95,11 +95,8 @@ web_server['uid'] = {{ gitlab_web_server_id }}
 web_server['gid'] = {{ gitlab_web_server_id }}
 registry['uid'] = {{ gitlab_registry_id }}
 registry['gid'] = {{ gitlab_registry_id }}
-mattermost['uid'] = {{ gitlab_mattermost_id }}
-mattermost['gid'] = {{ gitlab_mattermost_id }}
 prometheus['uid'] = {{ gitlab_prometheus_id }}
 prometheus['gid'] = {{ gitlab_prometheus_id }}
-
 # SSH
 {% if gitlab_ssh_listen_port is defined %}
 gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_listen_port }}
