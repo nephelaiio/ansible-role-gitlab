@@ -20,8 +20,6 @@ jobs:
             command: /lib/systemd/systemd
           - name: ubuntu2204
             command: /lib/systemd/systemd
-          - name: ubuntu2004
-            command: /lib/systemd/systemd
           - name: debian12
             command: /lib/systemd/systemd
           - name: debian11
@@ -30,7 +28,12 @@ jobs:
       - name: Run molecule test
         uses: pokerops/ansible-utils@master
         with:
-          run: "make install requirements test"
+          run: >
+            just
+            --set MOLECULE_SCENARIO ${{ matrix.scenario }}
+            --set MOLECULE_DOCKER_IMAGE ${{ matrix.image.name }}
+            --set MOLECULE_DOCKER_COMMAND ${{ matrix.image.command }}
+            install requirements test
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
